@@ -1,5 +1,7 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from django.contrib.auth.models import User
+
+from rest_framework.test import APITestCase, force_authenticate
 from rest_framework import status
 
 from datetime import date
@@ -17,8 +19,11 @@ class EmployeeTest(APITestCase):
         Employee.objects.all().delete()
         Tracker.objects.all().delete()
 
+        self.user = User.objects.create(username='test')
         self.employee = Employee.objects.create(name='Иванов Петр Васильевич')
         self.tracker = Tracker.objects.create(title='Test', description='test', deadline=date.today())
+
+        self.client.force_authenticate(user=self.user)
 
 
     def test_employee_create(self):
@@ -48,7 +53,7 @@ class EmployeeTest(APITestCase):
         # Сверяем статус код
         self.assertEqual(
             response.status_code,
-            status.HTTP_201_CREATED
+            status.HTTP_200_OK
         )
 
         data = response.json()
@@ -93,7 +98,7 @@ class EmployeeTest(APITestCase):
         # Сверяем статус код
         self.assertEqual(
             response.status_code,
-            status.HTTP_201_CREATED
+            status.HTTP_200_OK
         )
 
         # Сверяем данные

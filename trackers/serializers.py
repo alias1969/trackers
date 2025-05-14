@@ -10,7 +10,7 @@ class TrackerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_parent(self, value):
-        if value and self.pk == value.pk:
+        if value and self.instance.pk == value.pk:
             raise serializers.ValidationError(
                 "Задача не может ссылаться саму на себя"
             )
