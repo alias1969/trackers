@@ -20,6 +20,7 @@ class Employee(models.Model):
         max_length=250,
         verbose_name="должность",
         help_text="Введите должность сотрудника",
+        **NULLABLE
     )
 
     class Meta:

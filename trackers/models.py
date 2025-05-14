@@ -64,5 +64,5 @@ class Tracker(models.Model):
         verbose_name_plural = "Задачи"
 
     def __str__(self):
-        return f'{self.title}: {self.status} ({self.employee})'
+        return f'{self.title}: {self.status}'
 

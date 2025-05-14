@@ -39,6 +39,12 @@ class TrackerTest(APITestCase):
             data=data
         )
 
+        # Сверяем статус код
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
+
         # Сверяем данные с ожидаемыми
         self.assertEqual(
             response.json(),
@@ -49,10 +55,9 @@ class TrackerTest(APITestCase):
     def test_tracker_list(self):
         """ Тест списка всех задач """
 
-        url = reverse('tracker:tracker-list')
+        url = reverse('trackers:trackers-list')
         response = self.client.get(url)
         data = response.json()
-        print(data)
 
         # Сверяем данные с ожидаемыми
         self.assertEqual(
@@ -70,7 +75,7 @@ class TrackerTest(APITestCase):
     def test_tracker_retrieve(self):
         """ Тест детальной информации по задаче """
 
-        url = reverse('tracker:tracker-detail', args=(self.tracker.pk,))
+        url = reverse('trackers:trackers-detail', args=(self.tracker.pk,))
         response = self.client.get(url)
         data = response.json()
 
@@ -87,7 +92,7 @@ class TrackerTest(APITestCase):
     def test_tracker_update(self):
         """ Тестирование обновление задачи """
 
-        url = reverse("tracker:tracker-detail", args=(self.tracker.pk,))
+        url = reverse("trackers:trackers-detail", args=(self.tracker.pk,))
 
         data = {
             'employee': [self.employee.id],
@@ -98,6 +103,12 @@ class TrackerTest(APITestCase):
             'description': 'test',
         }
         response = self.client.patch(url, data=data)
+
+        # Сверяем статус код
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
 
         # Сверяем ожидаемое количество Tracker в БД
         self.assertEqual(
@@ -112,7 +123,7 @@ class TrackerTest(APITestCase):
     def test_tracker_delete(self):
         """ Тестирование удаление задачи """
 
-        url = reverse("tracker:tracker-detail", args=(self.tracker.pk,))
+        url = reverse("trackers:trackers-detail", args=(self.tracker.pk,))
 
         response = self.client.delete(url)
 
