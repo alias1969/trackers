@@ -1,0 +1,112 @@
+# Определяем сервисы
+services:
+
+  # Сервис базы данных PostgreSQL
+  postgres_db:
+    # Используем официальный образ PostgreSQL версии 16
+    image: postgres:16
+    container_name: postgres_db
+    env_file:
+      - .env
+    # Задаем переменные окружения для базы данных, пользователя и пароля
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    # Создаем volume для хранения данных PostgreSQL
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Сервис Redis
+  redis:
+    # Используем официальный образ Redis версии 6
+    image: redis:6
+    container_name: redis
+    command: sh -c "redis-server --save 20 i --loglevel warning"
+    volumes:
+      - .data.cache:/data
+    ports:
+      - "6380:6379"
+
+  # Сервис Django-приложения
+  app:
+    # Собираем образ на основе Dockerfile в текущей директории
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Задаем переменные окружения для подключения к базе данных и Redis
+    env_file:
+      - .env
+    container_name: app
+    tty: true
+    command: sh -c "python3 manage.py collectstatic --no-input && python3 manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    # Публикуем порт 8000 контейнера на порт 8000 хоста
+    expose:
+      - 8000
+    volumes:
+      - .:/app
+      - static_files:/app/static
+    # Указываем, что сервис зависит от db и redis
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  # Сервис Celery
+  celery:
+    # Собираем образ на основе Dockerfile в текущей директории
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery
+    env_file:
+      - .env
+    # Запускаем Celery в режиме worker и beat
+    command: sh -c "celery -A config worker --loglevel=info"
+    # Задаем переменные окружения для подключения к базе данных и Redis
+    # Указываем, что сервис зависит от db и redis
+    depends_on:
+      - redis
+
+  # Сервис Celery Beat
+  celery-beat:
+    # Собираем образ на основе Dockerfile в текущей директории
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Запускаем Celery Beat
+    container_name: beat
+    env_file:
+      - .env
+    command: sh -c "celery -A config beat --loglevel=info"
+    # Задаем переменные окружения для подключения к базе данных и Redis
+    # Указываем, что сервис зависит от db и redis
+    depends_on:
+      - app
+      - postgres_db
+      - redis
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - static_files:/app/static
+    depends_on:
+      - app
+
+# Определяем volume для хранения данных PostgreSQL
+volumes:
+  postgres_data:
+  .data.cache:
+  static_files:
