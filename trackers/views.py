@@ -16,7 +16,7 @@ class TrackerViewSet(viewsets.ModelViewSet):
     serializer_class = TrackerSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = TrackerFilter
-    ordering_fields = ('id', 'status')
+    ordering_fields = ("id", "status")
 
     def list(self, request, *args, **kwargs):
         """Вывод задач по ТЗ"""
@@ -35,16 +35,18 @@ class TrackerViewSet(viewsets.ModelViewSet):
             for item in serializer.data:
 
                 # получим имя исполителя задачи
-                employee_id = item['employee']
+                employee_id = item["employee"]
                 employee_info = Employee.objects.filter(id__in=employee_id)
                 employee_name = [employee.name for employee in employee_info]
 
                 # Создаем необходимый формат ответа
-                response.append({
-                    "Важная задача": item['title'],
-                    "Срок": item['deadline'],
-                    "Сотрудник": employee_name,
-                })
+                response.append(
+                    {
+                        "Важная задача": item["title"],
+                        "Срок": item["deadline"],
+                        "Сотрудник": employee_name,
+                    }
+                )
 
             return Response(response)
 

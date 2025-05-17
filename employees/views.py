@@ -11,8 +11,8 @@ from employees.serializers import EmployeeSerializer
 class EmployeeViewSet(viewsets.ModelViewSet):
     """ViewSet для Employee"""
 
-    queryset = Employee.objects.annotate(tracker_count=Count('tracker'))
+    queryset = Employee.objects.annotate(tracker_count=Count("tracker"))
     serializer_class = EmployeeSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = EmployeeFilter
-    ordering_fields = ('tracker_count', 'id')
+    ordering_fields = ("tracker_count", "id")
