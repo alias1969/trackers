@@ -12,9 +12,9 @@ class Tracker(models.Model):
     """Модель задачи"""
 
     STATUS_CHOICE = [
-        ('consideration', 'На рассмотрении'),
-        ('active', 'В работе'),
-        ('completed', 'Выполнена')
+        ("consideration", "На рассмотрении"),
+        ("active", "В работе"),
+        ("completed", "Выполнена"),
     ]
 
     title = models.CharField(
@@ -50,9 +50,9 @@ class Tracker(models.Model):
         **NULLABLE,
     )
 
-   # Статус задачи: consideration, active, completed
+    # Статус задачи: consideration, active, completed
     status = models.CharField(
-        default='consideration',
+        default="consideration",
         max_length=50,
         choices=STATUS_CHOICE,
         verbose_name="Статус",
@@ -64,5 +64,4 @@ class Tracker(models.Model):
         verbose_name_plural = "Задачи"
 
     def __str__(self):
-        return f'{self.title}: {self.status}'
-
+        return f"{self.title}: {self.status}"

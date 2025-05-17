@@ -4,7 +4,7 @@ from trackers.serializers import TrackerSerializer
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    """ Сериализатор для модели Employee"""
+    """Сериализатор для модели Employee"""
 
     # Вывод поля tracker_count только для чтения
     tracker_count = serializers.IntegerField(read_only=True)
@@ -12,4 +12,4 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = ['id', 'name', 'job_title', 'tracker_count', 'trackers']
+        fields = ["id", "name", "job_title", "tracker_count", "trackers"]
